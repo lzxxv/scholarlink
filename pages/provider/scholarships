@@ -1,0 +1,95 @@
+<?php
+require_once("../../config/db.php");
+require_once("../../config/auth.php");
+
+require_login();
+require_role("provider");
+
+$provider_id = $_SESSION['user_id'];
+
+// Toggle open/closed
+if (isset($_GET['toggle_id'])) {
+    $id = (int) $_GET['toggle_id'];
+
+    // only allow toggling own scholarships
+    $stmt = mysqli_prepare($conn, "SELECT status FROM scholarships WHERE id=? AND provider_id=?");
+    mysqli_stmt_bind_param($stmt, "ii", $id, $provider_id);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($res)) {
+        $new = ($row['status'] === 'open') ? 'closed' : 'open';
+        $upd = mysqli_prepare($conn, "UPDATE scholarships SET status=? WHERE id=? AND provider_id=?");
+        mysqli_stmt_bind_param($upd, "sii", $new, $id, $provider_id);
+        mysqli_stmt_execute($upd);
+    }
+    header("Location: scholarships.php");
+    exit();
+}
+
+// Fetch scholarships
+$stmt = mysqli_prepare($conn,
+    "SELECT id, title, deadline, status, created_at
+     FROM scholarships
+     WHERE provider_id=?
+     ORDER BY created_at DESC"
+);
+mysqli_stmt_bind_param($stmt, "i", $provider_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+require_once("../../includes/header.php");
+?>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">My Scholarships</h4>
+    <div class="text-muted">Manage your postings</div>
+  </div>
+  <a class="btn btn-primary" href="add_scholarship.php">+ Add Scholarship</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th style="width: 140px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if(mysqli_num_rows($result) == 0){ ?>
+            <tr><td colspan="4" class="text-center text-muted py-4">No scholarships yet.</td></tr>
+          <?php } ?>
+
+          <?php while($row = mysqli_fetch_assoc($result)){ ?>
+            <tr>
+              <td class="fw-semibold"><?php echo htmlspecialchars($row['title']); ?></td>
+              <td><?php echo htmlspecialchars($row['deadline']); ?></td>
+              <td>
+                <?php if($row['status'] === 'open'){ ?>
+                  <span class="badge bg-success">OPEN</span>
+                <?php } else { ?>
+                  <span class="badge bg-secondary">CLOSED</span>
+                <?php } ?>
+              </td>
+              <td>
+                <a class="btn btn-sm btn-outline-dark"
+                   href="scholarships.php?toggle_id=<?php echo $row['id']; ?>"
+                   onclick="return confirm('Change status?')">
+                   Toggle
+                </a>
+              </td>
+            </tr>
+          <?php } ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<?php require_once("../../includes/footer.php"); ?>
