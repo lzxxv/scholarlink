@@ -102,9 +102,6 @@ $initials = strtoupper(substr($display_name, 0, 1));
             <a class="nav-link sl-nav-link <?php echo $current_page == 'scholarships.php' ? 'active' : ''; ?>" href="../provider/scholarships.php">My Scholarships</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link sl-nav-link <?php echo $current_page == 'applicants.php' ? 'active' : ''; ?>" href="../provider/applicants.php">Applicants</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link sl-nav-link <?php echo $current_page == 'add_scholarship.php' ? 'active' : ''; ?>" href="../provider/add_scholarship.php">Add Scholarship</a>
           </li>
         <?php } ?>
