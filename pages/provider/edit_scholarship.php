@@ -6,80 +6,102 @@ require_login();
 require_role("provider");
 
 $provider_id = $_SESSION['user_id'];
-$scholarship_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-if ($scholarship_id <= 0) {
-    header("Location: scholarships.php");
-    exit();
-}
+$title = "";
+$description = "";
+$eligibility = "";
+$required_documents = "";
+$benefit = "";
+$total_slots = "";
+$location = "";
+$deadline = "";
+$status = "open";
 
-$msg = "";
-$msg_type = "info";
+$errors = [];
 
-/* Check ownership and fetch scholarship */
-$stmt = mysqli_prepare(
-    $conn,
-    "SELECT id, title, description, eligibility, deadline, status
-     FROM scholarships
-     WHERE id = ? AND provider_id = ?
-     LIMIT 1"
-);
-mysqli_stmt_bind_param($stmt, "ii", $scholarship_id, $provider_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-if (!$result || mysqli_num_rows($result) === 0) {
-    die("Scholarship not found or access denied.");
-}
-
-$scholarship = mysqli_fetch_assoc($result);
-
-if (isset($_POST['update_scholarship'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $eligibility = trim($_POST['eligibility'] ?? '');
-    $deadline = $_POST['deadline'] ?? '';
-    $status = $_POST['status'] ?? 'open';
+    $required_documents = trim($_POST['required_documents'] ?? '');
+    $benefit = trim($_POST['benefit'] ?? '');
+    $total_slots = (int) ($_POST['total_slots'] ?? 0);
+    $location = trim($_POST['location'] ?? '');
+    $deadline = trim($_POST['deadline'] ?? '');
+    $status = trim($_POST['status'] ?? 'open');
 
-    $allowed_status = ['open', 'closed'];
+    if ($title === '') {
+        $errors[] = "Scholarship title is required.";
+    }
 
-    if ($title === '' || $description === '' || $eligibility === '' || $deadline === '') {
-        $msg = "Please complete all fields.";
-        $msg_type = "warning";
-    } elseif (!in_array($status, $allowed_status, true)) {
-        $msg = "Invalid scholarship status.";
-        $msg_type = "danger";
-    } else {
+    if ($description === '') {
+        $errors[] = "Description is required.";
+    }
+
+    if ($benefit === '') {
+        $errors[] = "Scholarship benefit is required.";
+    }
+
+    if ($location === '') {
+        $errors[] = "Location / coverage is required.";
+    }
+
+    if ($eligibility === '') {
+        $errors[] = "Eligibility requirements are required.";
+    }
+
+    if ($required_documents === '') {
+        $errors[] = "Required documents are required.";
+    }
+
+    if ($total_slots <= 0) {
+        $errors[] = "Total slots must be greater than 0.";
+    }
+
+    if ($deadline === '') {
+        $errors[] = "Deadline is required.";
+    }
+
+    if (!in_array($status, ['open', 'closed'])) {
+        $status = 'open';
+    }
+
+    if (empty($errors)) {
         $update = mysqli_prepare(
             $conn,
             "UPDATE scholarships
-             SET title = ?, description = ?, eligibility = ?, deadline = ?, status = ?
+             SET title = ?, description = ?, eligibility = ?, required_documents = ?, benefit = ?, total_slots = ?, location = ?, deadline = ?, status = ?
              WHERE id = ? AND provider_id = ?"
         );
-        mysqli_stmt_bind_param(
-            $update,
-            "sssssii",
-            $title,
-            $description,
-            $eligibility,
-            $deadline,
-            $status,
-            $scholarship_id,
-            $provider_id
-        );
 
-        if (mysqli_stmt_execute($update)) {
-            $msg = "Scholarship updated successfully.";
-            $msg_type = "success";
+        if ($update) {
+            mysqli_stmt_bind_param(
+                $update,
+                "sssssisssii",
+                $title,
+                $description,
+                $eligibility,
+                $required_documents,
+                $benefit,
+                $total_slots,
+                $location,
+                $deadline,
+                $status,
+                $id,
+                $provider_id
+            );
 
-            $scholarship['title'] = $title;
-            $scholarship['description'] = $description;
-            $scholarship['eligibility'] = $eligibility;
-            $scholarship['deadline'] = $deadline;
-            $scholarship['status'] = $status;
+            if (mysqli_stmt_execute($update)) {
+                mysqli_stmt_close($update);
+                header("Location: scholarships.php?msg=updated");
+                exit;
+            } else {
+                $errors[] = "Failed to update scholarship: " . mysqli_error($conn);
+            }
+
+            mysqli_stmt_close($update);
         } else {
-            $msg = "Failed to update scholarship.";
-            $msg_type = "danger";
+            $errors[] = "Database error: " . mysqli_error($conn);
         }
     }
 }
@@ -87,77 +109,359 @@ if (isset($_POST['update_scholarship'])) {
 require_once("../../includes/header.php");
 ?>
 
-<link rel="stylesheet" href="/scholarlink/pages/assets/css/provider-add-scholarship.css">
+<link rel="stylesheet" href="/scholarlink/pages/assets/css/provider-add-scholarship.css?v=<?php echo time(); ?>">
 
-<div class="provider-add-page">
-  <div class="container py-4">
+<div class="scholarship-page">
+    <div class="scholarship-container">
 
-    <div class="page-heading mb-4">
-      <span class="page-badge">Scholarship Form</span>
-      <h2>Edit Scholarship</h2>
-      <p>Update your scholarship details and application availability.</p>
-    </div>
+        <div class="page-header">
+            <span class="page-badge">Scholarship Form</span>
+            <h1>Add Scholarship</h1>
+            <p>Create a scholarship listing through a guided step-by-step form.</p>
+        </div>
 
-    <div class="card provider-form-card">
-      <div class="card-body">
-        <?php if ($msg !== '') { ?>
-          <div class="alert alert-<?php echo htmlspecialchars($msg_type); ?>">
-            <?php echo htmlspecialchars($msg); ?>
-          </div>
-        <?php } ?>
-
-        <form method="POST">
-          <div class="mb-3">
-            <label class="form-label">Title</label>
-            <input
-              type="text"
-              name="title"
-              class="form-control"
-              value="<?php echo htmlspecialchars($scholarship['title']); ?>"
-              required
-            >
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="4" required><?php echo htmlspecialchars($scholarship['description']); ?></textarea>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Eligibility</label>
-            <textarea name="eligibility" class="form-control" rows="3" required><?php echo htmlspecialchars($scholarship['eligibility']); ?></textarea>
-          </div>
-
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Deadline</label>
-              <input
-                type="date"
-                name="deadline"
-                class="form-control"
-                value="<?php echo htmlspecialchars($scholarship['deadline']); ?>"
-                required
-              >
+        <?php if (!empty($errors)): ?>
+            <div class="alert alert-danger">
+                <strong>Please fix the following:</strong>
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?= htmlspecialchars($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
+        <?php endif; ?>
 
-            <div class="col-md-6">
-              <label class="form-label">Status</label>
-              <select name="status" class="form-control" required>
-                <option value="open" <?php if ($scholarship['status'] === 'open') echo 'selected'; ?>>Open</option>
-                <option value="closed" <?php if ($scholarship['status'] === 'closed') echo 'selected'; ?>>Closed</option>
-              </select>
+        <form method="POST" class="scholarship-form" id="scholarshipStepperForm">
+            <div class="stepper-card">
+
+                <div class="stepper-progress">
+                    <span id="stepProgressBar"></span>
+                </div>
+
+                <div class="stepper-nav">
+                    <div class="step-pill active" data-step-pill="1">
+                        <span class="step-num">1</span>
+                        <div>
+                            <strong>Basic Info</strong>
+                            <small>Title, benefit, location</small>
+                        </div>
+                    </div>
+
+                    <div class="step-pill" data-step-pill="2">
+                        <span class="step-num">2</span>
+                        <div>
+                            <strong>Requirements</strong>
+                            <small>Eligibility, documents, slots</small>
+                        </div>
+                    </div>
+
+                    <div class="step-pill" data-step-pill="3">
+                        <span class="step-num">3</span>
+                        <div>
+                            <strong>Publish</strong>
+                            <small>Deadline, status, review</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-panel active" data-step="1">
+                    <div class="form-section">
+                        <h2>Basic Information</h2>
+                        <p class="section-subtext">Enter the main scholarship details students will see first.</p>
+
+                        <div class="form-group">
+                            <label for="title">Scholarship Title</label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                value="<?= htmlspecialchars($title) ?>"
+                                placeholder="e.g. UCC Academic Scholarship 2026"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="5"
+                                placeholder="Write a short but clear description of the scholarship..."
+                                required
+                            ><?= htmlspecialchars($description) ?></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="benefit">Scholarship Benefit</label>
+                                <input
+                                    type="text"
+                                    id="benefit"
+                                    name="benefit"
+                                    value="<?= htmlspecialchars($benefit) ?>"
+                                    placeholder="e.g. Full tuition assistance"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="location">Location / Coverage</label>
+                                <input
+                                    type="text"
+                                    id="location"
+                                    name="location"
+                                    value="<?= htmlspecialchars($location) ?>"
+                                    placeholder="e.g. UCC Main Campus, Cebu City"
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-panel" data-step="2">
+                    <div class="form-section no-border no-space">
+                        <h2>Requirements</h2>
+                        <p class="section-subtext">Define who can apply and what documents they need to submit.</p>
+
+                        <div class="form-group">
+                            <label for="eligibility">Eligibility Requirements</label>
+                            <textarea
+                                id="eligibility"
+                                name="eligibility"
+                                rows="5"
+                                placeholder="e.g. Must be enrolled, no failing grades, minimum GWA of 1.75..."
+                                required
+                            ><?= htmlspecialchars($eligibility) ?></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="required_documents">Required Documents</label>
+                            <textarea
+                                id="required_documents"
+                                name="required_documents"
+                                rows="5"
+                                placeholder="e.g. COR, School ID, Latest Grades, Proof of Income..."
+                                required
+                            ><?= htmlspecialchars($required_documents) ?></textarea>
+                        </div>
+
+                        <div class="form-group form-group-sm">
+                            <label for="total_slots">Total Slots</label>
+                            <input
+                                type="number"
+                                id="total_slots"
+                                name="total_slots"
+                                min="1"
+                                value="<?= htmlspecialchars($total_slots) ?>"
+                                placeholder="e.g. 50"
+                                required
+                            >
+                            <small class="field-note">This will be used for availability like 50/50, 49/50, and so on.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-panel" data-step="3">
+                    <div class="form-section no-border no-space">
+                        <h2>Deadline & Status</h2>
+                        <p class="section-subtext">Finalize the scholarship and review everything before saving.</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="deadline">Application Deadline</label>
+                                <input
+                                    type="date"
+                                    id="deadline"
+                                    name="deadline"
+                                    min="<?= date('Y-m-d') ?>"
+                                    value="<?= htmlspecialchars($deadline) ?>"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status">Status</label>
+                                <select id="status" name="status" required>
+                                    <option value="open" <?= $status === 'open' ? 'selected' : '' ?>>Open</option>
+                                    <option value="closed" <?= $status === 'closed' ? 'selected' : '' ?>>Closed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="review-card">
+                            <h3>Review Preview</h3>
+
+                            <div class="review-grid">
+                                <div class="review-item">
+                                    <span>Title</span>
+                                    <strong id="reviewTitle">—</strong>
+                                </div>
+
+                                <div class="review-item">
+                                    <span>Benefit</span>
+                                    <strong id="reviewBenefit">—</strong>
+                                </div>
+
+                                <div class="review-item">
+                                    <span>Location</span>
+                                    <strong id="reviewLocation">—</strong>
+                                </div>
+
+                                <div class="review-item">
+                                    <span>Slots</span>
+                                    <strong id="reviewSlots">—</strong>
+                                </div>
+
+                                <div class="review-item">
+                                    <span>Deadline</span>
+                                    <strong id="reviewDeadline">—</strong>
+                                </div>
+
+                                <div class="review-item">
+                                    <span>Status</span>
+                                    <strong id="reviewStatus">—</strong>
+                                </div>
+                            </div>
+
+                            <div class="review-block">
+                                <span>Description</span>
+                                <p id="reviewDescription">—</p>
+                            </div>
+
+                            <div class="review-block">
+                                <span>Eligibility</span>
+                                <p id="reviewEligibility">—</p>
+                            </div>
+
+                            <div class="review-block">
+                                <span>Required Documents</span>
+                                <p id="reviewDocuments">—</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stepper-actions">
+                    <button type="button" class="btn btn-outline" id="prevBtn" style="display:none;">Back</button>
+                    <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display:none;">Save Scholarship</button>
+                    <a href="scholarships.php" class="btn btn-light">Cancel</a>
+                </div>
             </div>
-          </div>
-
-          <div class="mt-4 d-flex gap-2 flex-wrap">
-            <button type="submit" name="update_scholarship" class="btn btn-provider-primary">Save Changes</button>
-            <a href="scholarships.php" class="btn btn-provider-outline">Back to My Scholarships</a>
-          </div>
         </form>
-      </div>
     </div>
-
-  </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const panels = document.querySelectorAll('.step-panel');
+    const pills = document.querySelectorAll('.step-pill');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressBar = document.getElementById('stepProgressBar');
+
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const benefitInput = document.getElementById('benefit');
+    const locationInput = document.getElementById('location');
+    const eligibilityInput = document.getElementById('eligibility');
+    const documentsInput = document.getElementById('required_documents');
+    const slotsInput = document.getElementById('total_slots');
+    const deadlineInput = document.getElementById('deadline');
+    const statusInput = document.getElementById('status');
+
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function safeValue(value) {
+        return value && value.trim() !== '' ? value.trim() : '—';
+    }
+
+    function fillReview() {
+        document.getElementById('reviewTitle').textContent = safeValue(titleInput.value);
+        document.getElementById('reviewBenefit').textContent = safeValue(benefitInput.value);
+        document.getElementById('reviewLocation').textContent = safeValue(locationInput.value);
+        document.getElementById('reviewSlots').textContent = safeValue(slotsInput.value);
+        document.getElementById('reviewDeadline').textContent = safeValue(deadlineInput.value);
+        document.getElementById('reviewStatus').textContent = safeValue(statusInput.value);
+
+        document.getElementById('reviewDescription').textContent = safeValue(descriptionInput.value);
+        document.getElementById('reviewEligibility').textContent = safeValue(eligibilityInput.value);
+        document.getElementById('reviewDocuments').textContent = safeValue(documentsInput.value);
+    }
+
+    function validateStep(step) {
+        const currentPanel = document.querySelector('.step-panel[data-step="' + step + '"]');
+        const requiredFields = currentPanel.querySelectorAll('[required]');
+
+        for (let i = 0; i < requiredFields.length; i++) {
+            if (!requiredFields[i].checkValidity()) {
+                requiredFields[i].reportValidity();
+                requiredFields[i].focus();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function updateStepper() {
+        panels.forEach(panel => {
+            panel.classList.remove('active');
+            if (parseInt(panel.dataset.step) === currentStep) {
+                panel.classList.add('active');
+            }
+        });
+
+        pills.forEach(pill => {
+            const pillStep = parseInt(pill.dataset.stepPill);
+            pill.classList.remove('active', 'done');
+
+            if (pillStep === currentStep) {
+                pill.classList.add('active');
+            } else if (pillStep < currentStep) {
+                pill.classList.add('done');
+            }
+        });
+
+        const progressWidth = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        progressBar.style.width = progressWidth + '%';
+
+        prevBtn.style.display = currentStep === 1 ? 'none' : 'inline-flex';
+        nextBtn.style.display = currentStep === totalSteps ? 'none' : 'inline-flex';
+        submitBtn.style.display = currentStep === totalSteps ? 'inline-flex' : 'none';
+
+        if (currentStep === 3) {
+            fillReview();
+        }
+    }
+
+    nextBtn.addEventListener('click', function () {
+        if (!validateStep(currentStep)) return;
+        if (currentStep < totalSteps) {
+            currentStep++;
+            updateStepper();
+        }
+    });
+
+    prevBtn.addEventListener('click', function () {
+        if (currentStep > 1) {
+            currentStep--;
+            updateStepper();
+        }
+    });
+
+    [titleInput, descriptionInput, benefitInput, locationInput, eligibilityInput, documentsInput, slotsInput, deadlineInput, statusInput]
+        .forEach(field => {
+            field.addEventListener('input', fillReview);
+            field.addEventListener('change', fillReview);
+        });
+
+    updateStepper();
+});
+</script>
 
 <?php require_once("../../includes/footer.php"); ?>
