@@ -1,0 +1,128 @@
+body {
+  background: linear-gradient(180deg, #f4fbf6 0%, #edf7f0 100%);
+  color: #163125;
+}
+
+.my-applications-page {
+  min-height: 100vh;
+}
+
+.page-heading {
+  padding: 6px 2px 2px;
+}
+
+.page-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #e8f7ed;
+  border: 1px solid #d4ecdd;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #166534;
+  margin-bottom: 14px;
+}
+
+.page-heading h2 {
+  font-size: clamp(1.9rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+  color: #153625;
+}
+
+.page-heading p {
+  max-width: 720px;
+  color: #617568;
+  line-height: 1.7;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.applications-table-card {
+  border: 0;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(20, 83, 45, 0.08);
+}
+
+.applications-table-card .card-body {
+  padding: 24px;
+}
+
+.apps-table thead th {
+  border-bottom: 1px solid #e6f2e9;
+  color: #5f7366;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding-bottom: 14px;
+}
+
+.apps-table tbody td {
+  padding: 16px 8px;
+  border-color: #edf5ef;
+  color: #183626;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 116px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-submitted {
+  background: #eaf7ee;
+  color: #17763b;
+}
+
+.status-review {
+  background: #edf8f0;
+  color: #1f8b47;
+}
+
+.status-approved {
+  background: #dff5e7;
+  color: #0f6a31;
+}
+
+.status-rejected {
+  background: #ffe7e7;
+  color: #b42318;
+}
+
+.status-other {
+  background: #eef2ef;
+  color: #4c5f53;
+}
+
+.empty-inline {
+  border: 1px dashed #cfe4d5;
+  background: #f7fcf8;
+  color: #5b7466;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+@media (max-width: 767.98px) {
+  .applications-table-card .card-body {
+    padding: 18px;
+  }
+
+  .page-heading h2 {
+    font-size: 2rem;
+  }
+
+  .status-pill {
+    min-width: auto;
+  }
+}

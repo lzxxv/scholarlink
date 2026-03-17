@@ -7,6 +7,23 @@ require_role("provider");
 
 $provider_id = $_SESSION['user_id'];
 
+$message = "";
+$message_type = "info";
+
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'deleted') {
+        $message = "Scholarship deleted successfully.";
+        $message_type = "success";
+    } elseif ($_GET['msg'] === 'has_applications') {
+        $message = "This scholarship cannot be deleted because it already has applications.";
+        $message_type = "warning";
+    } elseif ($_GET['msg'] === 'error') {
+        $message = "Failed to delete scholarship.";
+        $message_type = "danger";
+    }
+}
+
+/* Toggle scholarship status */
 if (isset($_GET['toggle_id'])) {
     $id = (int) $_GET['toggle_id'];
 
@@ -26,7 +43,9 @@ if (isset($_GET['toggle_id'])) {
     exit();
 }
 
-$stmt = mysqli_prepare($conn,
+/* Scholarship list */
+$stmt = mysqli_prepare(
+    $conn,
     "SELECT id, title, deadline, status, created_at
      FROM scholarships
      WHERE provider_id=?
@@ -36,6 +55,7 @@ mysqli_stmt_bind_param($stmt, "i", $provider_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
+/* Stats */
 $total_scholarships = 0;
 $active_scholarships = 0;
 $total_applicants = 0;
@@ -56,7 +76,8 @@ if ($row = mysqli_fetch_assoc($stat2_res)) {
     $active_scholarships = (int)$row['total'];
 }
 
-$stat3 = mysqli_prepare($conn,
+$stat3 = mysqli_prepare(
+    $conn,
     "SELECT COUNT(*) AS total
      FROM applications a
      JOIN scholarships s ON a.scholarship_id = s.id
@@ -72,94 +93,107 @@ if ($row = mysqli_fetch_assoc($stat3_res)) {
 require_once("../../includes/header.php");
 ?>
 
-<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-  <div>
-    <span class="sl-section-tag">Provider Panel</span>
-    <h1 class="sl-page-title">My Scholarships</h1>
-    <p class="sl-page-subtitle mb-0">
-      Manage your scholarship postings, deadlines, and applicants in one place.
-    </p>
-  </div>
+<link rel="stylesheet" href="/scholarlink/pages/assets/css/provider-scholarships.css">
 
-  <div class="text-lg-end">
-    <a class="btn btn-sl-primary" href="add_scholarship.php">+ Add Scholarship</a>
-  </div>
-</div>
+<div class="provider-scholarships-page">
+  <div class="container py-4">
 
-<div class="row g-3 mb-4">
-  <div class="col-md-4">
-    <div class="sl-stat-card sl-stat-accent-dark">
-      <div class="sl-stat-label">Total Scholarships</div>
-      <div class="sl-stat-number"><?php echo $total_scholarships; ?></div>
+    <div class="page-heading mb-4">
+      <span class="page-badge">Provider Panel</span>
+      <h2>My Scholarships</h2>
+      <p>Manage your scholarship postings, deadlines, and applicants in one place.</p>
     </div>
-  </div>
-  <div class="col-md-4">
-    <div class="sl-stat-card sl-stat-accent-teal">
-      <div class="sl-stat-label">Active Scholarships</div>
-      <div class="sl-stat-number"><?php echo $active_scholarships; ?></div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="sl-stat-card sl-stat-accent-yellow">
-      <div class="sl-stat-label">Total Applicants</div>
-      <div class="sl-stat-number"><?php echo $total_applicants; ?></div>
-    </div>
-  </div>
-</div>
 
-<div class="sl-main-card">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h2 class="sl-card-title">Scholarship Listings</h2>
-      <p class="sl-card-subtitle">View and manage all your posted scholarships.</p>
+    <div class="page-actions mb-4">
+      <a class="btn btn-provider-primary" href="add_scholarship.php">+ Add Scholarship</a>
     </div>
-  </div>
 
-  <?php if(mysqli_num_rows($result) == 0){ ?>
-    <div class="sl-empty">
-      <div class="sl-empty-icon">🎓</div>
-      <div class="sl-empty-title">No scholarships posted yet</div>
-      <p class="sl-empty-text">
-        Start creating your first scholarship opportunity and manage applications here.
-      </p>
-      <a class="btn btn-sl-primary" href="add_scholarship.php">+ Add Scholarship</a>
+    <?php if ($message !== "") { ?>
+      <div class="alert alert-<?php echo htmlspecialchars($message_type); ?> shadow-sm mb-4">
+        <?php echo htmlspecialchars($message); ?>
+      </div>
+    <?php } ?>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="provider-stat-card">
+          <div class="provider-stat-label">Total Scholarships</div>
+          <div class="provider-stat-number"><?php echo $total_scholarships; ?></div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="provider-stat-card">
+          <div class="provider-stat-label">Active Scholarships</div>
+          <div class="provider-stat-number"><?php echo $active_scholarships; ?></div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="provider-stat-card">
+          <div class="provider-stat-label">Total Applicants</div>
+          <div class="provider-stat-number"><?php echo $total_applicants; ?></div>
+        </div>
+      </div>
     </div>
-  <?php } else { ?>
-    <div class="table-responsive">
-      <table class="table sl-table align-middle">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Deadline</th>
-            <th>Status</th>
-            <th style="width: 170px;">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php while($row = mysqli_fetch_assoc($result)){ ?>
-            <tr>
-              <td class="fw-bold"><?php echo htmlspecialchars($row['title']); ?></td>
-              <td><?php echo htmlspecialchars(date("F d, Y", strtotime($row['deadline']))); ?></td>
-              <td>
-                <?php if($row['status'] === 'open'){ ?>
-                  <span class="sl-badge sl-badge-open">OPEN</span>
-                <?php } else { ?>
-                  <span class="sl-badge sl-badge-closed">CLOSED</span>
+
+    <div class="card provider-table-card">
+      <div class="card-body">
+        <?php if (!$result || mysqli_num_rows($result) == 0) { ?>
+          <div class="empty-inline">No scholarships posted yet.</div>
+        <?php } else { ?>
+          <div class="table-responsive">
+            <table class="table provider-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th style="width: 280px;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php while($row = mysqli_fetch_assoc($result)) { ?>
+                  <tr>
+                    <td class="fw-semibold"><?php echo htmlspecialchars($row['title']); ?></td>
+                    <td><?php echo htmlspecialchars(date("F d, Y", strtotime($row['deadline']))); ?></td>
+                    <td>
+                      <?php if($row['status'] === 'open'){ ?>
+                        <span class="status-pill status-open">OPEN</span>
+                      <?php } else { ?>
+                        <span class="status-pill status-closed">CLOSED</span>
+                      <?php } ?>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-2 flex-wrap">
+                        <a class="btn btn-provider-outline btn-sm"
+                           href="edit_scholarship.php?id=<?php echo (int)$row['id']; ?>">
+                           Edit
+                        </a>
+
+                        <a class="btn btn-provider-outline btn-sm"
+                           href="scholarships.php?toggle_id=<?php echo (int)$row['id']; ?>"
+                           onclick="return confirm('Change scholarship status?')">
+                           Toggle Status
+                        </a>
+
+                        <a class="btn btn-provider-danger btn-sm"
+                           href="delete_scholarship.php?id=<?php echo (int)$row['id']; ?>"
+                           onclick="return confirm('Are you sure you want to delete this scholarship?')">
+                           Delete
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
                 <?php } ?>
-              </td>
-              <td>
-                <a class="btn btn-sm btn-sl-outline sl-btn-sm"
-                   href="scholarships.php?toggle_id=<?php echo (int)$row['id']; ?>"
-                   onclick="return confirm('Change scholarship status?')">
-                   Toggle Status
-                </a>
-              </td>
-            </tr>
-          <?php } ?>
-        </tbody>
-      </table>
+              </tbody>
+            </table>
+          </div>
+        <?php } ?>
+      </div>
     </div>
-  <?php } ?>
+
+  </div>
 </div>
 
 <?php require_once("../../includes/footer.php"); ?>

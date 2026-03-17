@@ -1,0 +1,322 @@
+body {
+  background: linear-gradient(180deg, #f4fbf6 0%, #edf7f0 100%);
+  color: #163125;
+}
+
+.admin-user-page {
+  min-height: 100vh;
+}
+
+.admin-user-page .page-heading {
+  padding: 6px 2px 2px;
+}
+
+.admin-user-page .page-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #e8f7ed;
+  border: 1px solid #d4ecdd;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #166534;
+  margin-bottom: 14px;
+}
+
+.admin-user-page .page-heading h2 {
+  font-size: clamp(1.9rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+  color: #153625;
+}
+
+.admin-user-page .page-heading p {
+  max-width: 720px;
+  color: #617568;
+  line-height: 1.7;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.admin-user-page .alert {
+  border-radius: 16px;
+  padding: 14px 16px;
+  border-width: 1px;
+}
+
+.admin-user-page .alert-success {
+  border: 1px solid #d8eddc;
+  background: #effaf2;
+  color: #166534;
+}
+
+.admin-user-page .alert-warning {
+  border: 1px solid #fde6c8;
+  background: #fff8ef;
+  color: #9a5a00;
+}
+
+.admin-user-page .alert-danger {
+  border: 1px solid #f5d6da;
+  background: #fff5f6;
+  color: #b42318;
+}
+
+.admin-user-page .btn-primary,
+.admin-user-page .btn-outline-primary {
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 700;
+}
+
+.admin-user-page .btn-primary {
+  background: #198754;
+  border: 1px solid #198754;
+  color: #fff;
+}
+
+.admin-user-page .btn-primary:hover {
+  background: #157347;
+  border-color: #157347;
+  color: #fff;
+}
+
+.admin-user-page .btn-outline-primary {
+  background: #ffffff;
+  border: 1px solid #b9d8c2;
+  color: #166534;
+}
+
+.admin-user-page .btn-outline-primary:hover {
+  background: #f4fbf6;
+  border-color: #9fc6ab;
+  color: #14532d;
+}
+
+.admin-user-page .user-table-card {
+  border: 0;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(20, 83, 45, 0.08);
+}
+
+.admin-user-page .user-table-card .card-body {
+  padding: 24px;
+}
+
+.admin-user-page .user-table thead th {
+  border-bottom: 1px solid #e6f2e9;
+  color: #5f7366;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 0 8px 14px;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.admin-user-page .user-table tbody td {
+  padding: 16px 8px;
+  border-color: #edf5ef;
+  color: #183626;
+  vertical-align: middle;
+  background: transparent;
+}
+
+.admin-user-page .role-pill,
+.admin-user-page .status-pill,
+.admin-user-page .verification-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-user-page .role-pill {
+  background: #eef8f1;
+  color: #17763b;
+}
+
+.admin-user-page .status-active {
+  background: #eef8f1;
+  color: #17763b;
+}
+
+.admin-user-page .status-pending {
+  background: #fff7e8;
+  color: #a16207;
+}
+
+.admin-user-page .status-inactive {
+  background: #fff1f2;
+  color: #b42318;
+}
+
+.admin-user-page .status-other {
+  background: #f1f5f2;
+  color: #587062;
+}
+
+.admin-user-page .verification-not_verified {
+  background: #f4f7f5;
+  color: #607467;
+}
+
+.admin-user-page .verification-pending {
+  background: #eef8f1;
+  color: #17763b;
+}
+
+.admin-user-page .verification-verified {
+  background: #eef8f1;
+  color: #17763b;
+}
+
+.admin-user-page .verification-rejected {
+  background: #fff1f2;
+  color: #b42318;
+}
+
+.admin-user-page .action-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-user-page .action-wrap .btn {
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+}
+
+.admin-user-page .btn-success {
+  background: #198754;
+  border: 1px solid #198754;
+  color: #fff;
+}
+
+.admin-user-page .btn-success:hover {
+  background: #157347;
+  border-color: #157347;
+  color: #fff;
+}
+
+.admin-user-page .btn-warning {
+  background: #ffffff;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.admin-user-page .btn-warning:hover {
+  background: #fff5f5;
+  color: #bb2d3b;
+  border-color: #bb2d3b;
+}
+
+.admin-user-page .btn-danger {
+  background: #ffffff;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+}
+
+.admin-user-page .btn-danger:hover {
+  background: #fff5f5;
+  color: #bb2d3b;
+  border-color: #bb2d3b;
+}
+
+.admin-user-page .btn-outline-secondary {
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid #cfe4d5;
+  color: #166534;
+}
+
+.admin-user-page .btn-outline-secondary:hover {
+  background: #f7fcf8;
+  border-color: #b8d5c1;
+  color: #14532d;
+}
+
+.admin-user-page .empty-inline {
+  border: 1px dashed #cfe4d5;
+  background: #f7fcf8;
+  color: #5b7466;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+@media (max-width: 991px) {
+  .admin-user-page .user-table-card .card-body {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 767px) {
+  .admin-user-page .page-heading h2 {
+    font-size: 1.6rem;
+  }
+
+  .admin-user-page .btn-primary,
+  .admin-user-page .btn-outline-primary {
+    width: 100%;
+  }
+
+  .admin-user-page .action-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-user-page .action-wrap .btn,
+  .admin-user-page .btn-outline-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-user-page .role-pill,
+  .admin-user-page .status-pill,
+  .admin-user-page .verification-pill {
+    min-width: unset;
+  }
+}
+
+.btn-green {
+  background: #198754;
+  border: 1px solid #198754;
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 700;
+  padding: 8px 16px;
+}
+
+.btn-green:hover {
+  background: #157347;
+  border-color: #157347;
+  color: #fff;
+}
+
+.btn-green-outline {
+  background: #ffffff;
+  border: 1px solid #b9d8c2;
+  color: #166534;
+  border-radius: 999px;
+  font-weight: 700;
+  padding: 8px 16px;
+}
+
+.btn-green-outline:hover {
+  background: #f4fbf6;
+  border-color: #9fc6ab;
+  color: #14532d;
+}
