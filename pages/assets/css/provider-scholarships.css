@@ -186,3 +186,169 @@ body {
   color: #bb2d3b;
   border-color: #bb2d3b;
 }
+
+.applicant-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #eef8f1;
+  border: 1px solid #d8ebde;
+  color: #166534;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.action-icons-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #dbeadf;
+  color: #166534;
+  text-decoration: none;
+  transition: all .2s ease;
+}
+
+.action-icon:hover {
+  background: #f5fcf7;
+  border-color: #b8d9c2;
+  color: #14532d;
+  transform: translateY(-1px);
+}
+
+.action-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.action-icon-applicants {
+  color: #166534;
+}
+
+.action-icon-edit {
+  color: #198754;
+}
+
+.action-icon-toggle {
+  color: #b7791f;
+}
+
+.action-icon-delete {
+  color: #dc3545;
+  border-color: #f0c7cc;
+}
+
+.action-icon-delete:hover {
+  background: #fff5f5;
+  border-color: #dc3545;
+  color: #bb2d3b;
+}
+
+
+.applicant-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #eef8f1;
+  border: 1px solid #d8ebde;
+  color: #166534;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.provider-table td:last-child,
+.provider-table th:last-child {
+  white-space: nowrap;
+}
+
+.action-icons-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.action-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #dbeadf;
+  color: #166534;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.action-icon:hover {
+  background: #f5fcf7;
+  border-color: #b8d9c2;
+  color: #14532d;
+  transform: translateY(-1px);
+}
+
+.action-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+  display: block;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.action-icon-applicants {
+  color: #166534;
+}
+
+.action-icon-edit {
+  color: #198754;
+}
+
+.action-icon-toggle {
+  color: #b7791f;
+}
+
+.action-icon-delete {
+  color: #dc3545;
+  border-color: #f0c7cc;
+}
+
+.action-icon-delete:hover {
+  background: #fff5f5;
+  border-color: #dc3545;
+  color: #bb2d3b;
+}
+
+
+.page-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-pending {
+  background: #fff4e5;
+  color: #b45309;
+}

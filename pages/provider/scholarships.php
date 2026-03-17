@@ -43,13 +43,21 @@ if (isset($_GET['toggle_id'])) {
     exit();
 }
 
-/* Scholarship list */
+/* Scholarship list with applicant count */
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT id, title, deadline, status, created_at
-     FROM scholarships
-     WHERE provider_id=?
-     ORDER BY created_at DESC"
+    "SELECT 
+        s.id,
+        s.title,
+        s.deadline,
+        s.status,
+        s.created_at,
+        COUNT(a.id) AS applicant_count
+     FROM scholarships s
+     LEFT JOIN applications a ON a.scholarship_id = s.id
+     WHERE s.provider_id=?
+     GROUP BY s.id, s.title, s.deadline, s.status, s.created_at
+     ORDER BY s.created_at DESC"
 );
 mysqli_stmt_bind_param($stmt, "i", $provider_id);
 mysqli_stmt_execute($stmt);
@@ -149,7 +157,8 @@ require_once("../../includes/header.php");
                   <th>Title</th>
                   <th>Deadline</th>
                   <th>Status</th>
-                  <th style="width: 280px;">Action</th>
+                  <th>Applicants</th>
+                  <th style="width: 220px;">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,22 +174,48 @@ require_once("../../includes/header.php");
                       <?php } ?>
                     </td>
                     <td>
-                      <div class="d-flex gap-2 flex-wrap">
-                        <a class="btn btn-provider-outline btn-sm"
-                           href="edit_scholarship.php?id=<?php echo (int)$row['id']; ?>">
-                           Edit
+                      <span class="applicant-count-badge">
+                        <?php echo (int)$row['applicant_count']; ?>
+                      </span>
+                    </td>
+                    <td>
+                      <div class="action-icons-wrap">
+                        <a class="action-icon action-icon-applicants"
+                           href="applicants.php?scholarship_id=<?php echo (int)$row['id']; ?>"
+                           title="View Applicants"
+                           aria-label="View Applicants">
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3Zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.98 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"></path>
+                          </svg>
                         </a>
 
-                        <a class="btn btn-provider-outline btn-sm"
+                        <a class="action-icon action-icon-edit"
+                           href="edit_scholarship.php?id=<?php echo (int)$row['id']; ?>"
+                           title="Edit Scholarship"
+                           aria-label="Edit Scholarship">
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm17.71-10.04a1.003 1.003 0 0 0 0-1.42l-2.5-2.5a1.003 1.003 0 0 0-1.42 0L14.96 5.12l3.75 3.75 1.99-1.66Z"></path>
+                          </svg>
+                        </a>
+
+                        <a class="action-icon action-icon-toggle"
                            href="scholarships.php?toggle_id=<?php echo (int)$row['id']; ?>"
-                           onclick="return confirm('Change scholarship status?')">
-                           Toggle Status
+                           onclick="return confirm('Change scholarship status?')"
+                           title="Toggle Status"
+                           aria-label="Toggle Status">
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5a5 5 0 0 1-8.66 3.54l-1.42 1.42A7 7 0 1 0 12 6Zm-5 5a5 5 0 0 1 8.66-3.54l1.42-1.42A7 7 0 1 0 12 20v3l4-4-4-4v3c-2.76 0-5-2.24-5-5Z"></path>
+                          </svg>
                         </a>
 
-                        <a class="btn btn-provider-danger btn-sm"
+                        <a class="action-icon action-icon-delete"
                            href="delete_scholarship.php?id=<?php echo (int)$row['id']; ?>"
-                           onclick="return confirm('Are you sure you want to delete this scholarship?')">
-                           Delete
+                           onclick="return confirm('Are you sure you want to delete this scholarship?')"
+                           title="Delete Scholarship"
+                           aria-label="Delete Scholarship">
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6 7h12l-1 14H7L6 7Zm3-3h6l1 2h4v2H4V6h4l1-2Z"></path>
+                          </svg>
                         </a>
                       </div>
                     </td>
