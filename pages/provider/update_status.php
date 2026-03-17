@@ -16,7 +16,6 @@ if ($app_id <= 0 || !in_array($status, $allowed, true)) {
     exit();
 }
 
-// Ensure provider owns the scholarship for this application
 $sql = "UPDATE applications a
         JOIN scholarships s ON a.scholarship_id = s.id
         SET a.status = ?

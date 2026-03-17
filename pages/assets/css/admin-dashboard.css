@@ -1,0 +1,250 @@
+body {
+  background: linear-gradient(180deg, #f4fbf6 0%, #edf7f0 100%);
+  color: #163125;
+}
+
+.admin-dashboard-page {
+  min-height: 100vh;
+}
+
+.admin-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  padding: 34px;
+  background: linear-gradient(135deg, #157f3b 0%, #1e9345 45%, #31b95a 100%);
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(20, 97, 49, 0.18);
+}
+
+.admin-hero-shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+
+.admin-hero-shape-1 {
+  width: 220px;
+  height: 220px;
+  top: -50px;
+  right: -45px;
+}
+
+.admin-hero-shape-2 {
+  width: 170px;
+  height: 170px;
+  bottom: -50px;
+  left: -30px;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.admin-hero h2 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.08;
+  margin-bottom: 12px;
+}
+
+.admin-hero p {
+  max-width: 760px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.admin-hero-panel {
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(8px);
+}
+
+.admin-panel-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: rgba(255,255,255,0.82);
+  margin-bottom: 8px;
+}
+
+.admin-panel-main {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.admin-panel-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.86);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.btn-admin-panel,
+.btn-admin-main {
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  background: #ffffff;
+  color: #166534;
+  border: 0;
+}
+
+.btn-admin-panel:hover,
+.btn-admin-main:hover {
+  color: #166534;
+  background: #f4fff7;
+}
+
+.admin-stat-card,
+.admin-main-card,
+.admin-side-card {
+  border: 0;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(20, 83, 45, 0.08);
+}
+
+.admin-stat-card .card-body,
+.admin-main-card .card-body,
+.admin-side-card .card-body {
+  padding: 24px;
+}
+
+.admin-stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.admin-stat-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #edf8f0;
+  color: #17763b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  background: linear-gradient(135deg, #dff7e7 0%, #c9f0d6 100%);
+  color: #166534;
+}
+
+.admin-stat-label {
+  font-size: 14px;
+  color: #5d6f63;
+  margin-bottom: 8px;
+}
+
+.admin-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #123524;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.admin-stat-note {
+  font-size: 13px;
+  color: #7a8d80;
+}
+
+.stat-pending { border-top: 5px solid #23a455; }
+.stat-active { border-top: 5px solid #38b86b; }
+.stat-open { border-top: 5px solid #7bcf97; }
+.stat-students { border-top: 5px solid #14853f; }
+
+.section-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #2a8d4d;
+  margin-bottom: 6px;
+}
+
+.section-title {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: #153625;
+  margin-bottom: 10px;
+}
+
+.section-text {
+  color: #64756a;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.admin-flow {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.flow-item {
+  border: 1px solid #e7f3ea;
+  background: #f8fcf9;
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.flow-item strong {
+  color: #143524;
+}
+
+.flow-item span {
+  color: #5f7366;
+  font-size: 14px;
+}
+
+.check-list {
+  display: grid;
+  gap: 12px;
+}
+
+.check-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e7f3ea;
+  background: #f8fcf9;
+  border-radius: 18px;
+  padding: 14px 16px;
+}
+
+.check-item span {
+  color: #5f7366;
+}
+
+.check-item strong {
+  color: #143524;
+}

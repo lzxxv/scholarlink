@@ -7,15 +7,16 @@ require_role("student");
 
 $student_id = $_SESSION['user_id'];
 
-$stmt = mysqli_prepare($conn,
-  "SELECT a.id AS app_id, a.status, a.created_at,
-          s.title, s.deadline,
-          u.full_name AS provider_name
-   FROM applications a
-   JOIN scholarships s ON a.scholarship_id = s.id
-   JOIN users u ON s.provider_id = u.id
-   WHERE a.student_id=?
-   ORDER BY a.id DESC"
+$stmt = mysqli_prepare(
+    $conn,
+    "SELECT a.id AS app_id, a.status, a.created_at,
+            s.title, s.deadline,
+            pp.organization_name AS provider_name
+     FROM applications a
+     JOIN scholarships s ON a.scholarship_id = s.id
+     JOIN provider_profiles pp ON s.provider_id = pp.user_id
+     WHERE a.student_id=?
+     ORDER BY a.id DESC"
 );
 mysqli_stmt_bind_param($stmt, "i", $student_id);
 mysqli_stmt_execute($stmt);
@@ -24,45 +25,68 @@ $result = mysqli_stmt_get_result($stmt);
 require_once("../../includes/header.php");
 ?>
 
-<h4 class="mb-3">My Applications</h4>
+<link rel="stylesheet" href="/scholarlink/pages/assets/css/my-applications.css">
 
-<div class="card shadow-sm">
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead>
-          <tr>
-            <th>Scholarship</th>
-            <th>Provider</th>
-            <th>Deadline</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php if(mysqli_num_rows($result) == 0){ ?>
-            <tr><td colspan="4" class="text-center text-muted py-4">No applications yet.</td></tr>
-          <?php } ?>
+<div class="my-applications-page">
+  <div class="container py-4">
 
-          <?php while($row = mysqli_fetch_assoc($result)){ ?>
-            <tr>
-              <td class="fw-semibold"><?php echo htmlspecialchars($row['title']); ?></td>
-              <td><?php echo htmlspecialchars($row['provider_name']); ?></td>
-              <td><?php echo htmlspecialchars($row['deadline']); ?></td>
-              <td>
+    <div class="page-heading mb-4">
+      <span class="page-badge">Application Records</span>
+      <h2>My Applications</h2>
+      <p>View and track all scholarship applications submitted through your account.</p>
+    </div>
+
+    <div class="card applications-table-card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table apps-table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Scholarship</th>
+                <th>Provider</th>
+                <th>Date Applied</th>
+                <th>Deadline</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if(!$result || mysqli_num_rows($result) == 0){ ?>
+                <tr>
+                  <td colspan="5" class="text-center py-4">
+                    <div class="empty-inline">No applications yet.</div>
+                  </td>
+                </tr>
+              <?php } ?>
+
+              <?php while($row = mysqli_fetch_assoc($result)){ ?>
                 <?php
                   $st = $row['status'];
-                  if ($st === 'submitted') echo '<span class="badge bg-primary">SUBMITTED</span>';
-                  elseif ($st === 'under_review') echo '<span class="badge bg-warning text-dark">UNDER REVIEW</span>';
-                  elseif ($st === 'approved') echo '<span class="badge bg-success">APPROVED</span>';
-                  elseif ($st === 'rejected') echo '<span class="badge bg-danger">REJECTED</span>';
-                  else echo htmlspecialchars($st);
+                  $cls = 'status-other';
+                  $label = strtoupper(str_replace('_', ' ', $st));
+
+                  if ($st === 'submitted') $cls = 'status-submitted';
+                  elseif ($st === 'under_review') $cls = 'status-review';
+                  elseif ($st === 'approved') $cls = 'status-approved';
+                  elseif ($st === 'rejected') $cls = 'status-rejected';
                 ?>
-              </td>
-            </tr>
-          <?php } ?>
-        </tbody>
-      </table>
+                <tr>
+                  <td class="fw-semibold"><?php echo htmlspecialchars($row['title']); ?></td>
+                  <td><?php echo htmlspecialchars($row['provider_name']); ?></td>
+                  <td><?php echo date("M d, Y", strtotime($row['created_at'])); ?></td>
+                  <td><?php echo htmlspecialchars($row['deadline']); ?></td>
+                  <td>
+                    <span class="status-pill <?php echo $cls; ?>">
+                      <?php echo htmlspecialchars($label); ?>
+                    </span>
+                  </td>
+                </tr>
+              <?php } ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+
   </div>
 </div>
 

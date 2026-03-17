@@ -1,0 +1,229 @@
+body {
+  background: linear-gradient(180deg, #f4fbf6 0%, #edf7f0 100%);
+  color: #163125;
+}
+
+.student-scholarships-page {
+  min-height: 100vh;
+}
+
+.browse-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  padding: 34px;
+  background: linear-gradient(135deg, #157f3b 0%, #1e9345 45%, #31b95a 100%);
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(20, 97, 49, 0.18);
+}
+
+.browse-hero-shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+}
+
+.browse-hero-shape-1 {
+  width: 220px;
+  height: 220px;
+  top: -50px;
+  right: -45px;
+}
+
+.browse-hero-shape-2 {
+  width: 170px;
+  height: 170px;
+  bottom: -50px;
+  left: -30px;
+}
+
+.browse-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.18);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.browse-hero h2 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+  max-width: 760px;
+}
+
+.browse-hero p {
+  max-width: 760px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.7;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.browse-summary-card {
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(8px);
+}
+
+.browse-summary-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: rgba(255,255,255,0.82);
+  margin-bottom: 8px;
+}
+
+.browse-summary-value {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.browse-summary-text {
+  font-size: 14px;
+  color: rgba(255,255,255,0.86);
+  line-height: 1.6;
+}
+
+.scholarship-card {
+  border: 0;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(20, 83, 45, 0.08);
+}
+
+.scholarship-card .card-body {
+  padding: 24px;
+}
+
+.scholarship-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.scholarship-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #153625;
+  margin-bottom: 6px;
+}
+
+.scholarship-provider {
+  font-size: 14px;
+  color: #6d806f;
+}
+
+.scholarship-badge {
+  background: #1da34d !important;
+  color: #fff;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+
+.info-block {
+  margin-bottom: 18px;
+}
+
+.info-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1b5e37;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 8px;
+}
+
+.info-text {
+  color: #64756a;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.scholarship-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+}
+
+.deadline-text span {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #6f8375;
+  margin-bottom: 4px;
+}
+
+.deadline-text strong {
+  color: #153625;
+  font-size: 15px;
+}
+
+.btn-apply-scholarship {
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #16813c 0%, #22ab54 100%);
+  border: 0;
+  color: #fff;
+}
+
+.btn-apply-scholarship:hover {
+  color: #fff;
+  opacity: .95;
+}
+
+.empty-box {
+  border: 1px dashed #cfe4d5;
+  background: #f7fcf8;
+  color: #5b7466;
+  border-radius: 20px;
+  padding: 22px;
+  text-align: center;
+}
+
+@media (max-width: 991.98px) {
+  .browse-hero {
+    padding: 26px 22px;
+    border-radius: 24px;
+  }
+
+  .browse-summary-value {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .scholarship-card .card-body {
+    padding: 18px;
+  }
+
+  .browse-hero h2 {
+    font-size: 2rem;
+  }
+
+  .scholarship-footer {
+    align-items: stretch;
+  }
+}
