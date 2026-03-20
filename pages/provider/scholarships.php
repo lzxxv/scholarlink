@@ -11,14 +11,23 @@ $message = "";
 $message_type = "info";
 
 if (isset($_GET['msg'])) {
-    if ($_GET['msg'] === 'deleted') {
+    if ($_GET['msg'] === 'created') {
+        $message = "Scholarship created successfully.";
+        $message_type = "success";
+    } elseif ($_GET['msg'] === 'updated') {
+        $message = "Scholarship updated successfully.";
+        $message_type = "success";
+    } elseif ($_GET['msg'] === 'deleted') {
         $message = "Scholarship deleted successfully.";
         $message_type = "success";
     } elseif ($_GET['msg'] === 'has_applications') {
         $message = "This scholarship cannot be deleted because it already has applications.";
         $message_type = "warning";
+    } elseif ($_GET['msg'] === 'slots_full') {
+        $message = "This scholarship already has full slots.";
+        $message_type = "warning";
     } elseif ($_GET['msg'] === 'error') {
-        $message = "Failed to delete scholarship.";
+        $message = "Something went wrong.";
         $message_type = "danger";
     }
 }
@@ -37,28 +46,36 @@ if (isset($_GET['toggle_id'])) {
         $upd = mysqli_prepare($conn, "UPDATE scholarships SET status=? WHERE id=? AND provider_id=?");
         mysqli_stmt_bind_param($upd, "sii", $new, $id, $provider_id);
         mysqli_stmt_execute($upd);
+        mysqli_stmt_close($upd);
     }
+
+    mysqli_stmt_close($stmt);
 
     header("Location: scholarships.php");
     exit();
 }
 
-/* Scholarship list with applicant count */
+/* Scholarship list with applicant count + approved count + slots */
 $stmt = mysqli_prepare(
     $conn,
     "SELECT 
         s.id,
         s.title,
+        s.benefit,
+        s.location,
+        s.total_slots,
         s.deadline,
         s.status,
         s.created_at,
-        COUNT(a.id) AS applicant_count
+        COUNT(a.id) AS applicant_count,
+        COALESCE(SUM(CASE WHEN a.status = 'approved' THEN 1 ELSE 0 END), 0) AS approved_count
      FROM scholarships s
      LEFT JOIN applications a ON a.scholarship_id = s.id
      WHERE s.provider_id=?
-     GROUP BY s.id, s.title, s.deadline, s.status, s.created_at
+     GROUP BY s.id, s.title, s.benefit, s.location, s.total_slots, s.deadline, s.status, s.created_at
      ORDER BY s.created_at DESC"
 );
+
 mysqli_stmt_bind_param($stmt, "i", $provider_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
@@ -75,6 +92,7 @@ $stat1_res = mysqli_stmt_get_result($stat1);
 if ($row = mysqli_fetch_assoc($stat1_res)) {
     $total_scholarships = (int)$row['total'];
 }
+mysqli_stmt_close($stat1);
 
 $stat2 = mysqli_prepare($conn, "SELECT COUNT(*) AS total FROM scholarships WHERE provider_id=? AND status='open'");
 mysqli_stmt_bind_param($stat2, "i", $provider_id);
@@ -83,6 +101,7 @@ $stat2_res = mysqli_stmt_get_result($stat2);
 if ($row = mysqli_fetch_assoc($stat2_res)) {
     $active_scholarships = (int)$row['total'];
 }
+mysqli_stmt_close($stat2);
 
 $stat3 = mysqli_prepare(
     $conn,
@@ -97,11 +116,12 @@ $stat3_res = mysqli_stmt_get_result($stat3);
 if ($row = mysqli_fetch_assoc($stat3_res)) {
     $total_applicants = (int)$row['total'];
 }
+mysqli_stmt_close($stat3);
 
 require_once("../../includes/header.php");
 ?>
 
-<link rel="stylesheet" href="/scholarlink/pages/assets/css/provider-scholarships.css">
+<link rel="stylesheet" href="/scholarlink/pages/assets/css/provider-scholarships.css?v=<?php echo time(); ?>">
 
 <div class="provider-scholarships-page">
   <div class="container py-4">
@@ -109,7 +129,7 @@ require_once("../../includes/header.php");
     <div class="page-heading mb-4">
       <span class="page-badge">Provider Panel</span>
       <h2>My Scholarships</h2>
-      <p>Manage your scholarship postings, deadlines, and applicants in one place.</p>
+      <p>Manage your scholarship postings, benefits, locations, deadlines, and applicants in one place.</p>
     </div>
 
     <div class="page-actions mb-4">
@@ -155,29 +175,63 @@ require_once("../../includes/header.php");
               <thead>
                 <tr>
                   <th>Title</th>
+                  <th>Benefit</th>
+                  <th>Location</th>
                   <th>Deadline</th>
+                  <th>Slots</th>
                   <th>Status</th>
                   <th>Applicants</th>
                   <th style="width: 220px;">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <?php while($row = mysqli_fetch_assoc($result)) { ?>
+                <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                  <?php
+                    $total_slots = (int)($row['total_slots'] ?? 0);
+                    $approved_count = (int)($row['approved_count'] ?? 0);
+                    $available_slots = max(0, $total_slots - $approved_count);
+                  ?>
                   <tr>
                     <td class="fw-semibold"><?php echo htmlspecialchars($row['title']); ?></td>
-                    <td><?php echo htmlspecialchars(date("F d, Y", strtotime($row['deadline']))); ?></td>
+
                     <td>
-                      <?php if($row['status'] === 'open'){ ?>
+                      <?php echo htmlspecialchars($row['benefit'] !== "" ? $row['benefit'] : "—"); ?>
+                    </td>
+
+                    <td>
+                      <?php echo htmlspecialchars($row['location'] !== "" ? $row['location'] : "—"); ?>
+                    </td>
+
+                    <td>
+                      <?php
+                        if (!empty($row['deadline']) && $row['deadline'] !== '0000-00-00') {
+                            echo htmlspecialchars(date("F d, Y", strtotime($row['deadline'])));
+                        } else {
+                            echo "—";
+                        }
+                      ?>
+                    </td>
+
+                    <td>
+                      <span class="applicant-count-badge">
+                        <?php echo $available_slots . "/" . $total_slots; ?>
+                      </span>
+                    </td>
+
+                    <td>
+                      <?php if ($row['status'] === 'open') { ?>
                         <span class="status-pill status-open">OPEN</span>
                       <?php } else { ?>
                         <span class="status-pill status-closed">CLOSED</span>
                       <?php } ?>
                     </td>
+
                     <td>
                       <span class="applicant-count-badge">
                         <?php echo (int)$row['applicant_count']; ?>
                       </span>
                     </td>
+
                     <td>
                       <div class="action-icons-wrap">
                         <a class="action-icon action-icon-applicants"
