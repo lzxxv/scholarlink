@@ -105,11 +105,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
-require_once("../../includes/header.php");
 ?>
-
-<link rel="stylesheet" href="/scholarlink/pages/assets/css/provider-add-scholarship.css?v=<?php echo time(); ?>">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Scholarship | ScholarLink</title>
+    <link rel="stylesheet" href="/scholarlink/pages/assets/css/provider-add-scholarship.css?v=<?php echo time(); ?>">
+</head>
+<body>
 
 <div class="scholarship-page">
     <div class="scholarship-container">
@@ -164,6 +169,7 @@ require_once("../../includes/header.php");
                     </div>
                 </div>
 
+                <!-- STEP 1 -->
                 <div class="step-panel active" data-step="1">
                     <div class="form-section">
                         <h2>Basic Information</h2>
@@ -220,6 +226,7 @@ require_once("../../includes/header.php");
                     </div>
                 </div>
 
+                <!-- STEP 2 -->
                 <div class="step-panel" data-step="2">
                     <div class="form-section no-border no-space">
                         <h2>Requirements</h2>
@@ -263,6 +270,7 @@ require_once("../../includes/header.php");
                     </div>
                 </div>
 
+                <!-- STEP 3 -->
                 <div class="step-panel" data-step="3">
                     <div class="form-section no-border no-space">
                         <h2>Deadline & Status</h2>
@@ -464,4 +472,5 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<?php require_once("../../includes/footer.php"); ?>
+</body>
+</html>

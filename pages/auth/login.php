@@ -2,14 +2,15 @@
 require_once("../../config/db.php");
 session_start();
 
-$msg = "";
+$msg      = "";
+$msg_type = "error";
 
 function clean($value) {
     return trim($value ?? "");
 }
 
 if (isset($_POST['login'])) {
-    $email = clean($_POST['email']);
+    $email    = clean($_POST['email']);
     $password = $_POST['password'] ?? '';
 
     if ($email === "" || $password === "") {
@@ -17,7 +18,7 @@ if (isset($_POST['login'])) {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $msg = "Please enter a valid email address.";
     } else {
-        $stmt = mysqli_prepare($conn, "SELECT id, email, password, role, status FROM users WHERE email = ? LIMIT 1");
+        $stmt = mysqli_prepare($conn, "SELECT id, email, password, role, status, email_verified FROM users WHERE email = ? LIMIT 1");
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -29,10 +30,16 @@ if (isset($_POST['login'])) {
                 $msg = "Invalid email or password.";
             } elseif ($user['status'] !== 'active') {
                 $msg = "Your account is currently disabled.";
+            } elseif ((int)$user['email_verified'] === 0) {
+                // Not yet verified — redirect to verify page
+                $_SESSION['pending_user_id']            = $user['id'];
+                $_SESSION['pending_verification_email'] = $user['email'];
+                header("Location: verify_email.php");
+                exit;
             } else {
                 $_SESSION['user_id'] = $user['id'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['role'] = $user['role'];
+                $_SESSION['email']   = $user['email'];
+                $_SESSION['role']    = $user['role'];
 
                 if ($user['role'] === 'provider') {
                     $providerStmt = mysqli_prepare($conn, "SELECT verification_status FROM provider_profiles WHERE user_id = ? LIMIT 1");
@@ -85,6 +92,12 @@ if (isset($_POST['login'])) {
       <h1 class="auth-title">Welcome Back</h1>
       <p class="auth-subtitle">Login to continue exploring scholarships and managing your account.</p>
 
+      <?php if (isset($_GET['msg']) && $_GET['msg'] === 'verified') : ?>
+        <div class="alert-box alert-success">
+          ✓ Email verified successfully! You can now log in.
+        </div>
+      <?php endif; ?>
+
       <?php if (!empty($msg)) : ?>
         <div class="alert-box alert-error">
           <?php echo htmlspecialchars($msg); ?>
@@ -124,7 +137,7 @@ if (isset($_POST['login'])) {
       </form>
 
       <div class="auth-footer">
-        Don’t have an account? <a href="register.php">Register</a>
+        Don't have an account? <a href="register.php">Register</a>
       </div>
     </div>
 
@@ -135,7 +148,6 @@ if (isset($_POST['login'])) {
           Sign in to ScholarLink and stay connected with scholarship opportunities, applications, and provider tools in one place.
         </p>
       </div>
-
       <div class="auth-image-wrap">
         <img src="../assets/Background.jpg" alt="ScholarLink Illustration" class="auth-illustration">
       </div>
@@ -145,9 +157,9 @@ if (isset($_POST['login'])) {
   <script>
     document.querySelectorAll('.toggle-password').forEach(button => {
       button.addEventListener('click', function () {
-        const target = document.getElementById(this.dataset.target);
+        const target    = document.getElementById(this.dataset.target);
         const isPassword = target.type === 'password';
-        target.type = isPassword ? 'text' : 'password';
+        target.type     = isPassword ? 'text' : 'password';
         this.textContent = isPassword ? 'Hide' : 'Show';
       });
     });
